@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ParkGrid</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="app">
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="index.html" class="logo-link">
+                        <span class="logo-text">ParkGrid</span>
+                    </a>
+                </div>
+
+                <div class="header-center">
+                    <h1 style="font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">Admin Dashboard</h1>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-top: 2px;">Manage parking slots and
+                        statuses</p>
+                </div>
+
+                <div class="header-right">
+                    <button onclick="openAddModal()" class="btn btn-primary" id="add-slot-btn">
+                        <i class="icon-plus" style="font-weight: 800; font-style: normal; margin-right: 4px;">+</i> Add Slot
+                    </button>
+                    
+                    <div class="header-divider"
+                        style="width: 1px; height: 32px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+                    
+                    <div class="auth-buttons" style="display: flex; gap: 10px; align-items: center;">
+                        <button onclick="window.location='index.html'" class="btn btn-outline btn-sm" id="view-live-btn"
+                            style="display:none; padding: 8px 16px; font-size: 13px;">Live View</button>
+                        <button onclick="logout()" class="btn btn-outline btn-sm" id="logout-btn"
+                            style="display:none; padding: 8px 16px; font-size: 13px;">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-toolbar fade-up delay-1"
+            style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="badge-success status-badge" style="font-size: 12px;">Management Mode</div>
+            
+            <button onclick="downloadCSVReport()" class="btn btn-success" id="download-csv-btn" 
+                    style="padding: 10px 20px; font-size: 13px; border-radius: 12px;">
+                <i class="icon-csv">📊</i> Download Reports
+            </button>
+        </div>
+
+        <div class="glass-panel" style="padding: 0; overflow: hidden;">
+            <div class="table-responsive">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Slot Name</th>
+                            <th>Status</th>
+                            <th>User Info</th>
+                            <th style="text-align: right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <!-- Data loads here -->
+                        <tr>
+                            <td colspan="5" class="text-center" style="padding: 40px;">
+                                <div class="spinner-large" style="margin: 0 auto;"></div>
+                                <p style="margin-top: 15px; color: var(--text-secondary);">Loading slots...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal (Hidden by default) -->
+    <div id="slot-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card glass-panel fade-up">
+            <h2 id="modal-title" style="margin-bottom: 20px;">Add Slot</h2>
+
+            <input type="hidden" id="modal-slot-id">
+            <input type="hidden" id="modal-mode" value="add"> <!-- add or edit -->
+
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>Slot Label (e.g. A1)</label>
+                <input id="modal-slot-name" type="text" placeholder="Slot Name" autocomplete="off">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 25px;">
+                <label>Status</label>
+                <select id="modal-slot-status" class="custom-select" onchange="toggleAdminBookingFields()">
+                    <option value="available">Available 🟢</option>
+                    <option value="booked">Booked 🔴</option>
+                </select>
+            </div>
+
+            <div id="admin-booking-fields" style="display: none;">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Vehicle Number</label>
+                    <input id="modal-vehicle-number" type="text" placeholder="e.g. MH12 AB1234">
+                </div>
+                <div class="input-group" style="margin-bottom: 25px;">
+                    <label>Vehicle Type</label>
+                    <select id="modal-vehicle-type" class="custom-select">
+                        <option value="Car">Car</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Truck">Truck</option>
+                    </select>
+                </div>
+                <div class="input-group" style="margin-bottom: 25px;">
+                    <label>Duration (Hours)</label>
+                    <input id="modal-duration" type="number" min="1" max="24" value="1">
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button class="btn btn-outline w-100" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary w-100" id="save-slot-btn" onclick="saveSlot()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card glass-panel fade-up">
+            <h2 style="margin-bottom: 20px;">Booking Details</h2>
+
+            <div id="details-content">
+                <!-- Dynamic content -->
+            </div>
+
+            <button class="btn btn-primary w-100" style="margin-top: 25px;" onclick="closeDetailsModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+
+</body>
+
+</html>

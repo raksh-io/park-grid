@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ParkGrid</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="login-body">
+    <a href="index.html" class="logo-link top-left-logo fade-up">
+        <!-- <span class="logo-text">ParkGrid</span> -->
+    </a>
+
+    <div class="login-centered-container">
+        <!-- Brand Header -->
+        <div class="login-branding fade-up">
+            <h1>ParkGrid</h1>
+            <p>Guiding you to the Best Spot.</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="login-card glass-panel fade-up delay-1">
+            <div class="login-header">
+                <h2 id="auth-mode-title">Welcome Back</h2>
+                <p class="subtitle" id="auth-mode-subtitle">Secure Authentication Panel</p>
+            </div>
+
+            <div class="form-container">
+                <!-- Role Selection Toggle -->
+                <div class="role-selector">
+                    <input type="radio" id="role-user" name="userRole" value="user" checked>
+                    <label for="role-user" class="role-btn">User</label>
+
+                    <input type="radio" id="role-admin" name="userRole" value="admin">
+                    <label for="role-admin" class="role-btn">Admin</label>
+                </div>
+
+                <!-- Email/Password Fields -->
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📧</span>
+                        <input id="email" type="email" placeholder="name@example.com" autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button onclick="handleAuthSubmit()" class="btn btn-primary w-100 mt-3" id="auth-submit-btn">Sign
+                    In</button>
+
+                <p id="toggle-mode-text"
+                    style="text-align: center; margin-top: 15px; font-size: 14px; color: var(--text-secondary);">
+                    Don't have an account? <a href="#" onclick="toggleAuthMode()"
+                        style="color: var(--primary); font-weight: 600; text-decoration: none;">Sign Up</a>
+                </p>
+
+                <div class="auth-divider">
+                    <span>OR CONTINUE WITH</span>
+                </div>
+
+                <!-- Google Login Button -->
+                <button onclick="signInWithGoogle()" class="btn btn-google w-100" id="btn-google">
+                    <svg viewBox="0 0 48 48" class="google-icon">
+                        <title>Google Logo</title>
+                        <clipPath id="g">
+                            <path
+                                d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11.4 0 21.4-8.2 20.5-26z" />
+                        </clipPath>
+                        <g class="colors" clip-path="url(#g)">
+                            <path fill="#FBBC05" d="M0 37V11l17 13z" />
+                            <path fill="#EA4335" d="M0 11l17 13 7-6.1L48 14V0H0z" />
+                            <path fill="#34A853" d="M0 37l30-23 7.9 1L48 0v48H0z" />
+                            <path fill="#4285F4" d="M48 48L17 24l-4-3 35-10z" />
+                        </g>
+                    </svg>
+                    Google Account
+                </button>
+            </div>
+
+            <div class="login-footer">
+                <p>Protected by Cloud-Native Auth & Realtime Sync</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="auth.js"></script>
+</body>
+
+</html>

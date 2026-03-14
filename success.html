@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Successful! - ParkGrid</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .success-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .success-card {
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.1);
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 50%;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .qr-container {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.5s 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+
+        .qr-label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .btn-download {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto 30px auto;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <div class="success-container">
+        <a href="index.html" class="logo-link" style="position: absolute; top: 30px; left: 40px;">
+            <span class="logo-text">ParkGrid</span>
+        </a>
+        <div class="success-card glass-panel fade-up">
+            <div class="success-icon">✅</div>
+            <h1 style="color: var(--success); margin-bottom: 10px;">Payment Successful!</h1>
+            <p class="subtitle" style="margin-bottom: 30px;">Your parking slot <span id="success-slot"
+                    style="font-weight: 800; color: white;">--</span> has been reserved successfully.</p>
+
+            <div
+                style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-bottom: 30px; text-align: left;">
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                    You can now proceed to the entry gate. Your vehicle number and timings have been registered in our
+                    system.
+                </p>
+            </div>
+
+            <div class="qr-container">
+                <div id="qrcode"></div>
+                <span class="qr-label">Scan at Entrance</span>
+            </div>
+
+            <button onclick="downloadQR()" class="btn-download">
+                <span>⬇️</span> Download Ticket
+            </button>
+
+            <button onclick="window.location.href='index.html'" class="btn btn-primary w-100">
+                Back to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const slotName = urlParams.get('slot') || 'N/A';
+        document.getElementById('success-slot').textContent = slotName;
+
+        // QR Code Generation
+        const bookingData = {
+            slot: slotName,
+            vehicle: urlParams.get('vehicle'),
+            vNumber: urlParams.get('vNumber'),
+            duration: urlParams.get('duration'),
+            amount: urlParams.get('amount'),
+            start: urlParams.get('start'),
+            end: urlParams.get('end'),
+            timestamp: new Date().toISOString()
+        };
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify(bookingData),
+            width: 180,
+            height: 180,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        function downloadQR() {
+            const qrCanvas = document.querySelector('#qrcode canvas');
+            if (qrCanvas) {
+                const link = document.createElement('a');
+                link.download = `ParkGrid-Ticket-${slotName}.png`;
+                link.href = qrCanvas.toDataURL("image/png");
+                link.click();
+            } else {
+                // If canvas is not ready, try to get from image
+                const qrImg = document.querySelector('#qrcode img');
+                if (qrImg && qrImg.src) {
+                    const link = document.createElement('a');
+                    link.download = `ParkGrid-Ticket-${slotName}.png`;
+                    link.href = qrImg.src;
+                    link.click();
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>

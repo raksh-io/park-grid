@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - ParkGrid</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .payment-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .payment-card {
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .order-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+            background: rgba(59, 130, 246, 0.1);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+        }
+
+        .payment-details {
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .detail-row:last-child {
+            margin-bottom: 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <div class="payment-container">
+        <a href="index.html" class="logo-link" style="position: absolute; top: 30px; left: 40px;">
+            <span class="logo-text">ParkGrid</span>
+        </a>
+        <div class="payment-card glass-panel fade-up">
+            <div class="order-icon">💳</div>
+            <h1 style="margin-bottom: 10px;">Complete Payment</h1>
+            <p class="subtitle">Secure your parking slot reservation</p>
+
+            <div class="payment-details">
+                <div class="detail-row">
+                    <span class="detail-label">Service</span>
+                    <span class="detail-value">Parking Reservation</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Slot Name</span>
+                    <span id="display-slot" class="detail-value">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Vehicle Type</span>
+                    <span id="display-vehicle" class="detail-value">--</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration</span>
+                    <span id="display-duration" class="detail-value">-- HRS</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Total Amount</span>
+                    <span id="display-amount" class="detail-value" style="color: var(--success);">₹--.--</span>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 25px;">
+                🔒 Secured by Razorpay. Your transaction is encrypted.
+            </p>
+
+            <button id="pay-btn" class="btn btn-primary w-100">
+                Pay Securely
+            </button>
+
+            <button id="cancel-btn" class="btn btn-outline w-100 mt-3"
+                style="border-color: rgba(255,255,255,0.1);">
+                Cancel Transaction
+            </button>
+        </div>
+    </div>
+
+    <!-- Need Supabase to release the slot on cancel -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        // Get exact details from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const slotName = urlParams.get('slot') || 'N/A';
+        const vType = urlParams.get('vehicle') || 'N/A';
+        const durationHours = urlParams.get('duration') || '0';
+        const totalAmount = urlParams.get('amount') || '0';
+        const pType = urlParams.get('type') || 'reservation';
+        
+        // Update UI Breakdown
+        if (pType === 'fine') {
+            document.querySelector('.subtitle').textContent = "Pay your overstay fine to release the slot";
+            document.querySelectorAll('.detail-value')[0].textContent = "Overstay Fine";
+            document.getElementById('pay-btn').textContent = "Pay Fine ₹" + totalAmount;
+        }
+
+        document.getElementById('display-slot').textContent = slotName;
+        document.getElementById('display-vehicle').textContent = vType;
+        document.getElementById('display-duration').textContent = pType === 'fine' ? "LATE" : durationHours + " Hour(s)";
+        document.getElementById('display-amount').textContent = "₹" + totalAmount;
+        if (pType !== 'fine') document.getElementById('pay-btn').textContent = "Pay ₹" + totalAmount + " Now";
+
+        const options = {
+            key: "rzp_test_SQk0EkOne70egd",
+            amount: (parseInt(totalAmount) * 100).toString(), // Convert to paise
+            currency: "INR",
+            name: "ParkGrid",
+            description: pType === 'fine' ? `Overstay Fine: ${slotName}` : `Parking Reservation: ${slotName} (${durationHours}hrs)`,
+            prefill: {
+                name: "User",
+                email: "user@example.com",
+                contact: "9876543210"
+            },
+            handler: async function (response) {
+                if (pType === 'fine') {
+                    showToast("Fine paid successfully! Releasing slot...", "success");
+                    await releaseSlotAfterPayment();
+                } else {
+                    const successParams = new URLSearchParams({
+                        slot: slotName,
+                        vehicle: vType,
+                        duration: durationHours,
+                        amount: totalAmount,
+                        vNumber: urlParams.get('vNumber'),
+                        start: urlParams.get('start'),
+                        end: urlParams.get('end')
+                    }).toString();
+                    window.location.href = "success.html?" + successParams;
+                }
+            },
+            modal: {
+                ondismiss: function() {
+                    console.log("Razorpay checkout closed by user.");
+                    if (pType !== 'fine') cancelReservation();
+                    else window.location.href = 'index.html';
+                }
+            },
+            theme: {
+                color: "#3b82f6"
+            }
+        };
+
+        const rzp = new Razorpay(options);
+
+        // Utility to show toast (stolen from script.js logic)
+        function showToast(msg, type) {
+            alert(msg); // Fallback for simplicity in payment.html
+        }
+
+        async function releaseSlotAfterPayment() {
+            const { error } = await supabaseClient
+                .from("slots")
+                .update({ 
+                    status: "available",
+                    vehicle: null,
+                    vehicle_type: null,
+                    start_time: null,
+                    end_time: null,
+                    user_email: null,
+                    fine_amount: 0,
+                    fine_start_time: null
+                })
+                .eq("slot", slotName);
+            
+            if (error) {
+                alert("Payment successful but slot release failed. Please contact admin.");
+            }
+            window.location.href = "index.html";
+        }
+
+        document.getElementById("pay-btn").onclick = function (e) {
+            rzp.open();
+            e.preventDefault();
+        }
+        
+        // Cancellation Logic
+        async function cancelReservation() {
+            if (pType === 'fine') {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const cancelBtn = document.getElementById('cancel-btn');
+            cancelBtn.disabled = true;
+            cancelBtn.innerHTML = 'Cancelling...';
+
+            if (slotName !== 'N/A') {
+                console.log(`Cancelling reservation for slot: ${slotName}`);
+                // Release the slot back to the pool
+                const { error } = await supabaseClient
+                    .from("slots")
+                    .update({ 
+                        status: "available",
+                        vehicle: null,
+                        vehicle_type: null,
+                        start_time: null,
+                        end_time: null,
+                        user_email: null,
+                        fine_amount: 0,
+                        fine_start_time: null
+                    })
+                    .eq("slot", slotName);
+                    
+                if (error) {
+                    console.error("Failed to release slot on cancel:", error);
+                }
+            }
+            // Always redirect back home after attempting to release
+            window.location.href = 'index.html';
+        }
+
+        // Attach to the explicit cancel button
+        document.getElementById('cancel-btn').onclick = function() {
+            cancelReservation();
+        };
+    </script>
+
+</body>
+
+</html>
