@@ -60,8 +60,12 @@ replacements.forEach(item => {
         const envValue = process.env[pair.env];
         if (envValue) {
             console.log(`✅ Injecting ${pair.env} into ${item.file}`);
-            content = content.replace(pair.placeholder, envValue);
+            // Use a global regex to replace all occurrences
+            const regex = new RegExp(pair.placeholder, 'g');
+            content = content.replace(regex, envValue);
             modified = true;
+        } else {
+            console.warn(`❌ Skipping ${pair.env}: Environment variable not set in Vercel.`);
         }
     });
 
