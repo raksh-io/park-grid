@@ -60,12 +60,13 @@ replacements.forEach(item => {
         const envValue = process.env[pair.env];
         if (envValue) {
             console.log(`✅ Injecting ${pair.env} into ${item.file}`);
-            // Use a global regex to replace all occurrences
             const regex = new RegExp(pair.placeholder, 'g');
             content = content.replace(regex, envValue);
             modified = true;
         } else {
-            console.warn(`❌ Skipping ${pair.env}: Environment variable not set in Vercel.`);
+            console.error(`❌ ERROR: Environment variable "${pair.env}" is NOT set in Vercel!`);
+            console.error(`👉 Go to Project Settings > Environment Variables and add "${pair.env}".`);
+            process.exit(1); // Stop the build immediately
         }
     });
 
