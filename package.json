@@ -1,0 +1,10 @@
+{
+  "name": "park-grid",
+  "version": "1.0.0",
+  "description": "Smart Parking Solution",
+  "main": "index.html",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {}
+}

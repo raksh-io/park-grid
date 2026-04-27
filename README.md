@@ -77,8 +77,12 @@ Since ParkGrid is a static web application, you can deploy it for free using var
 
 ### Vercel / Netlify
 1. Connect your GitHub repository.
-2. Select the `park-grid` folder as the root.
-3. Deploy! (No build command needed).
+2. **Configure Environment Variables**: Go to Project Settings > Environment Variables and add:
+   - `SUPABASE_URL`: Your Supabase Project URL
+   - `SUPABASE_ANON_KEY`: Your Supabase Anon Key
+   - `RAZORPAY_KEY`: Your Razorpay Test/Live Key
+3. Deploy! The build script will automatically inject these into your code.
+
 
 ### GitHub Pages
 1. Go to Repository **Settings** > **Pages**.
