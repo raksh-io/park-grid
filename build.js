@@ -1,50 +1,73 @@
 const fs = require('fs');
 const path = require('path');
 
-// Configuration
-const filesToProcess = [
-    {
-        path: './config.js',
-        replacements: [
+// Folder to output the final site
+const outputDir = './dist';
+
+// Files and folders to copy to dist
+const assetsToCopy = [
+    'admin.html', 'admin.js', 'auth.js', 'config.js', 'index.html',
+    'landing.html', 'login.html', 'payment.html', 'script.js',
+    'style.css', 'success.html', 'Bg.jpeg', 'logo.png'
+];
+
+// Placeholders to replace inside the dist folder
+const replacements = [
+    { 
+        file: 'config.js', 
+        pairs: [
             { placeholder: 'YOUR_SUPABASE_URL', env: 'SUPABASE_URL' },
             { placeholder: 'YOUR_SUPABASE_ANON_KEY', env: 'SUPABASE_ANON_KEY' }
-        ]
+        ] 
     },
-    {
-        path: './payment.html',
-        replacements: [
+    { 
+        file: 'payment.html', 
+        pairs: [
             { placeholder: 'YOUR_RAZORPAY_KEY', env: 'RAZORPAY_KEY' }
-        ]
+        ] 
     }
 ];
 
-console.log('🚀 Starting build process: Injecting environment variables...');
+console.log('🚀 Starting professional build process...');
 
-filesToProcess.forEach(file => {
-    const filePath = path.resolve(__dirname, file.path);
-    if (!fs.existsSync(filePath)) {
-        console.warn(`⚠️ Warning: File not found: ${file.path}`);
-        return;
+// 1. Create or clean dist folder
+if (fs.existsSync(outputDir)) {
+    fs.rmSync(outputDir, { recursive: true, force: true });
+}
+fs.mkdirSync(outputDir);
+
+// 2. Copy assets to dist
+assetsToCopy.forEach(asset => {
+    const src = path.resolve(__dirname, asset);
+    const dest = path.resolve(__dirname, outputDir, asset);
+    if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest);
+        console.log(`📂 Copied: ${asset}`);
+    } else {
+        console.warn(`⚠️ Warning: Asset not found: ${asset}`);
     }
+});
+
+// 3. Perform injections in the dist folder
+replacements.forEach(item => {
+    const filePath = path.resolve(__dirname, outputDir, item.file);
+    if (!fs.existsSync(filePath)) return;
 
     let content = fs.readFileSync(filePath, 'utf8');
     let modified = false;
 
-    file.replacements.forEach(rep => {
-        const envValue = process.env[rep.env];
+    item.pairs.forEach(pair => {
+        const envValue = process.env[pair.env];
         if (envValue) {
-            console.log(`✅ Injecting ${rep.env} into ${file.path}`);
-            content = content.replace(rep.placeholder, envValue);
+            console.log(`✅ Injecting ${pair.env} into ${item.file}`);
+            content = content.replace(pair.placeholder, envValue);
             modified = true;
-        } else {
-            console.warn(`❌ Skipping ${rep.env}: Environment variable not set.`);
         }
     });
 
     if (modified) {
         fs.writeFileSync(filePath, content);
-        console.log(`💾 Successfully updated ${file.path}`);
     }
 });
 
-console.log('✨ Build completed!');
+console.log('✨ Build completed! Your site is ready in the /dist folder.');
