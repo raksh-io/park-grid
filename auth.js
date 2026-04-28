@@ -7,9 +7,9 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
     console.log("Auth Event:", event);
     if (session) {
         const role = sessionStorage.getItem('selectedRole') || 'user';
-        const targetPage = role === 'admin' ? 'admin.html' : 'index.html';
+        const targetPage = role === 'admin' ? 'admin.html' : 'dashboard.html';
         
-        if (!window.location.pathname.includes('index.html') && !window.location.pathname.includes('admin.html')) {
+        if (!window.location.pathname.includes('dashboard.html') && !window.location.pathname.includes('admin.html')) {
             window.location.href = targetPage;
         }
     }

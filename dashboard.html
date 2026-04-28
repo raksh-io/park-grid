@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkGrid Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="app">
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="dashboard.html" class="logo-link">
+                        <span class="logo-text">ParkGrid</span>
+                    </a>
+                </div>
+
+                <div class="header-center">
+                    <h1 style="font-size: 40px; font-weight: 700; letter-spacing: -0.5px;">User Dashboard</h1>
+                    <!-- <p style="color: var(--text-secondary); font-size: 14px; margin-top: 2px;">Real-time availability -->
+                    <!-- system</p> -->
+                </div>
+
+                <div class="header-right">
+                    <button onclick="logout()" class="btn btn-outline" id="logout-btn"
+                        style="display:none;">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <div id="stats" class="stats">
+            <!-- Stats load here -->
+            <div class="loading-state">
+                <div class="spinner-large"></div>
+                <p>Loading stats...</p>
+            </div>
+        </div>
+
+        <div class="parking-section glass-panel">
+            <div class="label entry">ENTRY &rarr;</div>
+
+            <div id="parking">
+                <!-- Slots load here -->
+                <div class="loading-state">
+                    <div class="spinner-large"></div>
+                    <p>Loading parking lots...</p>
+                </div>
+            </div>
+
+            <div class="label exit">&larr; EXIT</div>
+            <p class="realtime-badge"><span class="pulse-dot"></span> Live Updates Active</p>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card glass-panel fade-up">
+            <h2>Book Slot <span id="target-slot-name"></span></h2>
+            <p class="subtitle" style="margin-bottom: 20px;">Enter vehicle and timing details</p>
+
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>Vehicle Number</label>
+                <input id="vehicle-number" type="text" placeholder="e.g. KA 01 AB 1234">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>Vehicle Type</label>
+                <select id="vehicle-type" class="custom-select">
+                    <option value="Car">🚗 Car</option>
+                    <option value="Bike">🏍️ Bike</option>
+                    <option value="Truck">🚛 Truck</option>
+                </select>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>Start Time</label>
+                <input id="start-time" type="datetime-local">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label>End Time</label>
+                <input id="end-time" type="datetime-local">
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <button class="btn btn-outline w-100" onclick="closeBookingModal()">Cancel</button>
+                <button class="btn btn-primary w-100" id="confirm-booking-btn"
+                    onclick="confirmBooking()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

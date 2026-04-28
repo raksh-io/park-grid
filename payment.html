@@ -70,7 +70,7 @@
 <body class="dashboard-body">
 
     <div class="payment-container">
-        <a href="index.html" class="logo-link" style="position: absolute; top: 30px; left: 40px;">
+        <a href="dashboard.html" class="logo-link" style="position: absolute; top: 30px; left: 40px;">
             <span class="logo-text">ParkGrid</span>
         </a>
         <div class="payment-card glass-panel fade-up">
@@ -174,7 +174,7 @@
                 ondismiss: function() {
                     console.log("Razorpay checkout closed by user.");
                     if (pType !== 'fine') cancelReservation();
-                    else window.location.href = 'index.html';
+                    else window.location.href = 'dashboard.html';
                 }
             },
             theme: {
@@ -207,7 +207,7 @@
             if (error) {
                 alert("Payment successful but slot release failed. Please contact admin.");
             }
-            window.location.href = "index.html";
+            window.location.href = "dashboard.html";
         }
 
         document.getElementById("pay-btn").onclick = function (e) {
@@ -218,7 +218,7 @@
         // Cancellation Logic
         async function cancelReservation() {
             if (pType === 'fine') {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
                 return;
             }
 
@@ -248,7 +248,7 @@
                 }
             }
             // Always redirect back home after attempting to release
-            window.location.href = 'index.html';
+            window.location.href = 'dashboard.html';
         }
 
         // Attach to the explicit cancel button

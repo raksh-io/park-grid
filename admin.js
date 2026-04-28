@@ -21,7 +21,7 @@ async function checkAuthAndInitAdmin(){
         console.warn("Admin Dashboard: Access denied. Redirecting to user index.");
         showToast("Access Denied: You do not have admin privileges.", "error");
         setTimeout(() => {
-            window.location = "index.html";
+            window.location = "dashboard.html";
         }, 2000);
         return;
     }

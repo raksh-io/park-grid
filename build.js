@@ -7,7 +7,7 @@ const outputDir = './dist';
 // Files and folders to copy to dist
 const assetsToCopy = [
     'admin.html', 'admin.js', 'auth.js', 'config.js', 'index.html',
-    'landing.html', 'login.html', 'payment.html', 'script.js',
+    'dashboard.html', 'login.html', 'payment.html', 'script.js',
     'style.css', 'success.html', 'Bg.jpeg', 'logo.png'
 ];
 
